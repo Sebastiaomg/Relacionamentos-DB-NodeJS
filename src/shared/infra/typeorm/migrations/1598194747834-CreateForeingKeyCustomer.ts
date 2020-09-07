@@ -17,6 +17,6 @@ export default class CreateForeingKeyCustomer1598194747834
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKey('orders', 'OrderCustomer');
+    await queryRunner.dropForeignKey('orders', 'OrdersCustomer');
   }
 }

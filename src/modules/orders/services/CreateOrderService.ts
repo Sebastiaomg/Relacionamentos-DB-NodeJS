@@ -33,20 +33,24 @@ class CreateOrderService {
     if (!customer) {
       throw new AppError('Customer not found');
     }
-    const products_ids = products.map(product => {
-      return { id: product.id };
-    });
-    const productsFinded = await this.productsRepository.findAllById(
-      products_ids,
+    const productsFinded = await this.productsRepository.findAllById(products);
+    if (!productsFinded.length) {
+      throw new AppError('Cousd not find any product with the given ids');
+    }
+    const productsFindedIds = productsFinded.map(product => product.id);
+    const inexistentProducts = products.filter(
+      product => !productsFindedIds.includes(product.id),
     );
-    if (productsFinded.length < 1) {
-      throw new AppError('Product not found');
+    if (inexistentProducts.length) {
+      throw new AppError(`Could not find product ${inexistentProducts[0].id}`);
     }
     const productsFindedUpdateQuantities: IProduct[] = [];
     const productsPriceQuantity = productsFinded.map(product => {
       const [productQuantity] = products.filter(prod => prod.id === product.id);
       if (product.quantity < productQuantity.quantity) {
-        throw new AppError('Product insufficiet quantitie.');
+        throw new AppError(
+          `Insufficiet quantitie for product with id ${productQuantity.id}.`,
+        );
       }
 
       const quantity =
